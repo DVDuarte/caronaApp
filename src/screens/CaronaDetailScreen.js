@@ -8,7 +8,6 @@ import { joinCarona } from "../utils/storage";
 export default function CaronaDetailScreen({ route, navigation }) {
   const { carona } = route.params;
   
-  // 🔹 Definir o estado corretamente
   const [tracking, setTracking] = useState(false);
   const [location, setLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
@@ -52,7 +51,6 @@ export default function CaronaDetailScreen({ route, navigation }) {
             const { latitude, longitude } = newLocation.coords;
             setLocation({ latitude, longitude });
 
-            // 🔹 Atualiza o trajeto percorrido
             setRouteCoordinates((prevCoords) => [...prevCoords, { latitude, longitude }]);
 
             setMapRegion({
