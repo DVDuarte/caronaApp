@@ -113,4 +113,3 @@ const styles = StyleSheet.create({
   map: { width: "100%", height: 300, marginBottom: 20 },
   button: { backgroundColor: "#34C759" },
 });
-r
