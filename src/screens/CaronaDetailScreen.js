@@ -2,76 +2,46 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import MapView, { Marker, Polyline } from "react-native-maps";
-import * as Location from "expo-location";
 import { joinCarona } from "../utils/storage";
 
 export default function CaronaDetailScreen({ route, navigation }) {
   const { carona } = route.params;
   
-  const [tracking, setTracking] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [mapRegion, setMapRegion] = useState(null);
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
 
   useEffect(() => {
-    const getInitialLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Erro", "Permissão de localização negada");
-        return;
-      }
-
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = currentLocation.coords;
-      
-      setLocation({ latitude, longitude });
-      setMapRegion({
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      });
-    };
-
-    getInitialLocation();
+    setupMap();
   }, []);
 
-  useEffect(() => {
-    let locationSubscription;
+  const setupMap = async () => {
+    const [startLat, startLng] = carona.saida.split(',').map(coord => parseFloat(coord.trim()));
+    const [endLat, endLng] = carona.destino.split(',').map(coord => parseFloat(coord.trim()));
 
-    if (tracking) {
-      const startTracking = async () => {
-        locationSubscription = await Location.watchPositionAsync(
-          {
-            accuracy: Location.Accuracy.High,
-            timeInterval: 3000,
-            distanceInterval: 5, 
-          },
-          (newLocation) => {
-            const { latitude, longitude } = newLocation.coords;
-            setLocation({ latitude, longitude });
+    const startCoord = { latitude: startLat, longitude: startLng };
+    const endCoord = { latitude: endLat, longitude: endLng };
 
-            setRouteCoordinates((prevCoords) => [...prevCoords, { latitude, longitude }]);
+    // Configurar a região do mapa
+    setMapRegion({
+      latitude: startLat,
+      longitude: startLng,
+      latitudeDelta: Math.abs(startLat - endLat) * 1.5,
+      longitudeDelta: Math.abs(startLng - endLng) * 1.5,
+    });
 
-            setMapRegion({
-              latitude,
-              longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
-          }
-        );
-      };
+    // Configurar as coordenadas da rota
+    setRouteCoordinates([startCoord, endCoord]);
 
-      startTracking();
-    }
+    // Obter e desenhar a rota real (você precisará implementar esta função)
+    await getRouteCoordinates(startCoord, endCoord);
+  };
 
-    return () => {
-      if (locationSubscription) {
-        locationSubscription.remove();
-      }
-    };
-  }, [tracking]);
+  const getRouteCoordinates = async (start, end) => {
+    // Aqui você deve implementar a lógica para obter as coordenadas da rota
+    // usando um serviço como a API de Direções do Google
+    // Por enquanto, vamos usar uma linha reta entre os pontos
+    setRouteCoordinates([start, end]);
+  };
 
   const handleJoin = async () => {
     if (carona.passageiros.length >= carona.vagas) {
@@ -80,7 +50,6 @@ export default function CaronaDetailScreen({ route, navigation }) {
     }
     await joinCarona(carona.id, "Usuário Exemplo");
     Alert.alert("Sucesso", "Você entrou na carona!");
-    setTracking(true);
   };
 
   return (
@@ -94,14 +63,33 @@ export default function CaronaDetailScreen({ route, navigation }) {
       </Card>
 
       {mapRegion && (
-        <MapView style={styles.map} region={mapRegion} showsUserLocation={true}>
-          {location && <Marker coordinate={location} title="Sua Localização" />}
-          <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="blue" />
+        <MapView style={styles.map} region={mapRegion}>
+          <Marker 
+            coordinate={{
+              latitude: parseFloat(carona.saida.split(',')[0]),
+              longitude: parseFloat(carona.saida.split(',')[1])
+            }}
+            title="Saída"
+            pinColor="green"
+          />
+          <Marker 
+            coordinate={{
+              latitude: parseFloat(carona.destino.split(',')[0]),
+              longitude: parseFloat(carona.destino.split(',')[1])
+            }}
+            title="Destino"
+            pinColor="red"
+          />
+          <Polyline 
+            coordinates={routeCoordinates}
+            strokeWidth={4}
+            strokeColor="blue"
+          />
         </MapView>
       )}
 
       <Button mode="contained" onPress={handleJoin} style={styles.button}>
-        {tracking ? "Carona em andamento..." : "Entrar na Carona"}
+        Entrar na Carona
       </Button>
     </View>
   );

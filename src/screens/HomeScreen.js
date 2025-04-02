@@ -17,23 +17,31 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button mode="contained" onPress={() => navigation.navigate("CriarCarona")} style={styles.button}>
-        Criar Carona
+      <Button 
+        mode="contained" 
+        onPress={() => navigation.navigate("CriarCarona")} 
+        style={styles.button}
+      >
+        Adicionar Carona
       </Button>
 
-      <FlatList
-        data={caronas}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <Card style={styles.card} onPress={() => navigation.navigate("DetalhesCarona", { carona: item })}>
-            <Card.Content>
-              <Text variant="titleMedium">{item.saida} → {item.destino}</Text>
-              <Text>Vagas: {item.vagas - item.passageiros.length}</Text>
-              <Text>Motorista: {item.motorista}</Text>
-            </Card.Content>
-          </Card>
-        )}
-      />
+      {caronas.length === 0 ? (
+        <Text style={styles.emptyMessage}>Sem carona ainda</Text>
+      ) : (
+        <FlatList
+          data={caronas}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <Card style={styles.card} onPress={() => navigation.navigate("DetalhesCarona", { carona: item })}>
+              <Card.Content>
+                <Text variant="titleMedium">{item.saida} → {item.destino}</Text>
+                <Text>Vagas: {item.vagas - item.passageiros.length}</Text>
+                <Text>Motorista: {item.motorista}</Text>
+              </Card.Content>
+            </Card>
+          )}
+        />
+      )}
     </View>
   );
 }
@@ -41,5 +49,6 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#F2F2F7" },
   button: { marginBottom: 15, backgroundColor: "#007AFF" },
-  card: { marginBottom: 10, backgroundColor: "#FFF", elevation: 3 }
+  card: { marginBottom: 10, backgroundColor: "#FFF", elevation: 3 },
+  emptyMessage: { textAlign: 'center', marginTop: 20, fontSize: 18 }
 });
