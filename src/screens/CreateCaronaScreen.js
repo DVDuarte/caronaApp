@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { TextInput, Button, Text } from "react-native-paper";
 import { saveCarona } from "../utils/storage";
 
+
 export default function CreateCaronaScreen({ navigation }) {
   const [saida, setSaida] = useState("");
   const [destino, setDestino] = useState("");
