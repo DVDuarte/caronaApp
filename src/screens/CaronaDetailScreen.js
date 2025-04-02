@@ -7,9 +7,11 @@ import { joinCarona } from "../utils/storage";
 
 export default function CaronaDetailScreen({ route, navigation }) {
   const { carona } = route.params;
+  
+  // 🔹 Definir o estado corretamente
+  const [tracking, setTracking] = useState(false);
   const [location, setLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
-  const [tracking, setTracking] = useState(false);
   const [mapRegion, setMapRegion] = useState(null);
 
   useEffect(() => {
@@ -43,13 +45,16 @@ export default function CaronaDetailScreen({ route, navigation }) {
         locationSubscription = await Location.watchPositionAsync(
           {
             accuracy: Location.Accuracy.High,
-            timeInterval: 3000, 
-            distanceInterval: 5,
+            timeInterval: 3000,
+            distanceInterval: 5, 
           },
           (newLocation) => {
             const { latitude, longitude } = newLocation.coords;
             setLocation({ latitude, longitude });
+
+            // 🔹 Atualiza o trajeto percorrido
             setRouteCoordinates((prevCoords) => [...prevCoords, { latitude, longitude }]);
+
             setMapRegion({
               latitude,
               longitude,
@@ -91,11 +96,7 @@ export default function CaronaDetailScreen({ route, navigation }) {
       </Card>
 
       {mapRegion && (
-        <MapView
-          style={styles.map}
-          region={mapRegion}
-          showsUserLocation={true}
-        >
+        <MapView style={styles.map} region={mapRegion} showsUserLocation={true}>
           {location && <Marker coordinate={location} title="Sua Localização" />}
           <Polyline coordinates={routeCoordinates} strokeWidth={4} strokeColor="blue" />
         </MapView>
@@ -112,5 +113,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#F2F2F7" },
   card: { marginBottom: 20, backgroundColor: "#FFF", elevation: 3 },
   map: { width: "100%", height: 300, marginBottom: 20 },
-  button: { backgroundColor: "#34C759" }
+  button: { backgroundColor: "#34C759" },
 });
+r
