@@ -16,23 +16,17 @@
       ]
     ],
     "android": {
-      "permissions": ["CAMERA", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
       "config": {
         "googleMaps": {
-          "apiKey": "SUA_CHAVE_API_GOOGLE_MAPS"
+          "apiKey": "SUA_API_KEY_AQUI"
         }
       }
     },
     "ios": {
-      "infoPlist": {
-        "NSCameraUsageDescription": "O aplicativo precisa acessar sua câmera para fotografar o local de partida.",
-        "NSLocationWhenInUseUsageDescription": "O aplicativo precisa acessar sua localização para mostrar caronas próximas."
-      },
       "config": {
-        "googleMapsApiKey": "SUA_CHAVE_API_GOOGLE_MAPS"
+        "googleMapsApiKey": "SUA_API_KEY_AQUI"
       }
     },
     "newArchEnabled": true
-
   }
 }

@@ -6,10 +6,32 @@ import { Ionicons } from '@expo/vector-icons';
 export default function RideDetails({ route, navigation }) {
   const { ride } = route.params;
   
+  // Função auxiliar para obter o nome do local (compatível com ambos formatos)
+  const getLocationName = (location) => {
+    if (!location) return "Local não definido";
+    
+    // Novo formato (objeto com propriedade name)
+    if (typeof location === 'object' && location.name) {
+      return location.name;
+    }
+    
+    // Formato antigo (string direta)
+    return location;
+  };
+
+  // Função auxiliar para obter o endereço detalhado (apenas no novo formato)
+  const getLocationAddress = (location) => {
+    if (!location || typeof location !== 'object' || !location.address) {
+      return null;
+    }
+    
+    return location.address;
+  };
+  
   const handleRequestRide = () => {
     Alert.alert(
       'Confirmar solicitação',
-      `Deseja solicitar uma vaga nesta carona para ${ride.destination}?`,
+      `Deseja solicitar uma vaga nesta carona para ${getLocationName(ride.destination)}?`,
       [
         { text: 'Cancelar', style: 'cancel' },
         { 
@@ -50,7 +72,10 @@ export default function RideDetails({ route, navigation }) {
             </View>
             <View style={styles.locationTextContainer}>
               <Text style={styles.locationLabel}>Origem</Text>
-              <Text style={styles.locationName}>{ride.origin}</Text>
+              <Text style={styles.locationName}>{getLocationName(ride.origin)}</Text>
+              {getLocationAddress(ride.origin) && (
+                <Text style={styles.addressText}>{getLocationAddress(ride.origin)}</Text>
+              )}
             </View>
           </View>
           
@@ -62,7 +87,10 @@ export default function RideDetails({ route, navigation }) {
             </View>
             <View style={styles.locationTextContainer}>
               <Text style={styles.locationLabel}>Destino</Text>
-              <Text style={styles.locationName}>{ride.destination}</Text>
+              <Text style={styles.locationName}>{getLocationName(ride.destination)}</Text>
+              {getLocationAddress(ride.destination) && (
+                <Text style={styles.addressText}>{getLocationAddress(ride.destination)}</Text>
+              )}
             </View>
           </View>
         </View>
@@ -74,7 +102,7 @@ export default function RideDetails({ route, navigation }) {
         <View style={styles.driverContainer}>
           <View style={styles.driverAvatar}>
             <Text style={styles.driverInitial}>
-              {ride.driver.charAt(0) || 'M'}
+              {ride.driver && ride.driver.charAt(0) || 'M'}
             </Text>
           </View>
           
@@ -91,20 +119,41 @@ export default function RideDetails({ route, navigation }) {
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Informações adicionais</Text>
         
-        <View style={styles.infoRow}>
-          <Ionicons name="car-outline" size={20} color="#666666" />
-          <Text style={styles.infoText}>Honda Civic Prata</Text>
-        </View>
+        {ride.vehicle ? (
+          <View style={styles.infoRow}>
+            <Ionicons name="car-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>{ride.vehicle}</Text>
+          </View>
+        ) : (
+          <View style={styles.infoRow}>
+            <Ionicons name="car-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>Veículo não especificado</Text>
+          </View>
+        )}
         
-        <View style={styles.infoRow}>
-          <Ionicons name="cash-outline" size={20} color="#666666" />
-          <Text style={styles.infoText}>R$ 5,00 por pessoa</Text>
-        </View>
+        {ride.price ? (
+          <View style={styles.infoRow}>
+            <Ionicons name="cash-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>R$ {ride.price.toFixed(2)} por pessoa</Text>
+          </View>
+        ) : (
+          <View style={styles.infoRow}>
+            <Ionicons name="cash-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>Contribuição não especificada</Text>
+          </View>
+        )}
         
-        <View style={styles.infoRow}>
-          <Ionicons name="information-circle-outline" size={20} color="#666666" />
-          <Text style={styles.infoText}>Saída do estacionamento principal</Text>
-        </View>
+        {ride.notes ? (
+          <View style={styles.infoRow}>
+            <Ionicons name="information-circle-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>{ride.notes}</Text>
+          </View>
+        ) : (
+          <View style={styles.infoRow}>
+            <Ionicons name="information-circle-outline" size={20} color="#666666" />
+            <Text style={styles.infoText}>Sem observações adicionais</Text>
+          </View>
+        )}
       </View>
       
       <Button 
@@ -169,12 +218,13 @@ const styles = StyleSheet.create({
   },
   locationRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginVertical: 8,
   },
   locationIconContainer: {
     width: 24,
     alignItems: 'center',
+    marginTop: 4,
   },
   originDot: {
     width: 12,
@@ -196,6 +246,7 @@ const styles = StyleSheet.create({
   },
   locationTextContainer: {
     marginLeft: 12,
+    flex: 1,
   },
   locationLabel: {
     fontSize: 12,
@@ -204,6 +255,11 @@ const styles = StyleSheet.create({
   locationName: {
     fontSize: 16,
     fontWeight: '500',
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#666666',
+    marginTop: 2,
   },
   sectionTitle: {
     fontSize: 18,
@@ -252,6 +308,7 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     marginLeft: 12,
+    flex: 1,
   },
   requestButton: {
     margin: 16,
