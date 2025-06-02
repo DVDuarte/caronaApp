@@ -17,7 +17,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button mode="contained" onPress={() => navigation.navigate("CriarCarona")} style={styles.button}>
+      <Button mode="contained" onPress={() => navigation.navigate("CreateCarona")} style={styles.button}>
         Criar Carona
       </Button>
 
@@ -25,7 +25,7 @@ export default function HomeScreen({ navigation }) {
         data={caronas}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <Card style={styles.card} onPress={() => navigation.navigate("DetalhesCarona", { carona: item })}>
+          <Card style={styles.card} onPress={() => navigation.navigate("CaronaDetails", { carona: item })}>
             <Card.Content>
               <Text variant="titleMedium">{item.saida} → {item.destino}</Text>
               <Text>Vagas: {item.vagas - item.passageiros.length}</Text>

@@ -1,19 +1,22 @@
 import React from "react";
-import { createStackNavigator } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import HomeScreen from "../screens/HomeScreen";
 import CreateCaronaScreen from "../screens/CreateCaronaScreen";
 import CaronaDetailScreen from "../screens/CaronaDetailScreen";
+import QRScannerScreen from "../screens/QRScannerScreen";
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="CriarCarona" component={CreateCaronaScreen} />
-        <Stack.Screen name="DetalhesCarona" component={CaronaDetailScreen} />
+        <Stack.Screen name="CreateCarona" component={CreateCaronaScreen} />
+        <Stack.Screen name="CaronaDetail" component={CaronaDetailScreen} />
+        <Stack.Screen name="QRScanner" component={QRScannerScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

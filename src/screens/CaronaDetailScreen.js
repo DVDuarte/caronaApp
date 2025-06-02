@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, Image } from "react-native";
 import { Card, Text, Button } from "react-native-paper";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import { joinCarona } from "../utils/storage";
+import QRCode from "react-native-qrcode-svg";
 
 export default function CaronaDetailScreen({ route, navigation }) {
   const { carona } = route.params;
-  
+
   const [tracking, setTracking] = useState(false);
   const [location, setLocation] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
@@ -23,7 +24,7 @@ export default function CaronaDetailScreen({ route, navigation }) {
 
       const currentLocation = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = currentLocation.coords;
-      
+
       setLocation({ latitude, longitude });
       setMapRegion({
         latitude,
@@ -45,7 +46,7 @@ export default function CaronaDetailScreen({ route, navigation }) {
           {
             accuracy: Location.Accuracy.High,
             timeInterval: 3000,
-            distanceInterval: 5, 
+            distanceInterval: 5,
           },
           (newLocation) => {
             const { latitude, longitude } = newLocation.coords;
@@ -90,6 +91,11 @@ export default function CaronaDetailScreen({ route, navigation }) {
           <Text variant="titleMedium">{carona.saida} → {carona.destino}</Text>
           <Text>Vagas disponíveis: {carona.vagas - carona.passageiros.length}</Text>
           <Text>Motorista: {carona.motorista}</Text>
+
+          {/* Exibir a foto do motorista, se disponível */}
+          {carona.motoristaFoto && (
+            <Image source={{ uri: carona.motoristaFoto }} style={styles.motoristaFoto} />
+          )}
         </Card.Content>
       </Card>
 
@@ -103,6 +109,12 @@ export default function CaronaDetailScreen({ route, navigation }) {
       <Button mode="contained" onPress={handleJoin} style={styles.button}>
         {tracking ? "Carona em andamento..." : "Entrar na Carona"}
       </Button>
+
+      <QRCode value={String(carona.id)} size={150} />
+      <Button onPress={() => navigation.navigate("QRScanner")} mode="outlined" style={{ marginTop: 10 }}>
+        Ler QR Code
+      </Button>
+
     </View>
   );
 }
@@ -112,4 +124,12 @@ const styles = StyleSheet.create({
   card: { marginBottom: 20, backgroundColor: "#FFF", elevation: 3 },
   map: { width: "100%", height: 300, marginBottom: 20 },
   button: { backgroundColor: "#34C759" },
+  motoristaFoto: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginTop: 10,
+    marginBottom: 10,
+    alignSelf: "center",
+  },
 });
